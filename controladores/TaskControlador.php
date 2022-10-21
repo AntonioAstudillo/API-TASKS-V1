@@ -88,8 +88,12 @@ class TaskControlador
       }
    }
 
-
-
+   /**
+    * [insertTask description]
+    * @param  [type] $data                  [description]
+    * @param  [type] $bandera               [description]
+    * @return [type]          [description]
+    */
    public function insertTask($data , $bandera)
    {
 
@@ -113,14 +117,66 @@ class TaskControlador
 
       if($rowCount = $this->modelo->insertTask($data) <= 0)
       {
-         $response->generateResponse(500 , false , 'Failed to create task');
+         $this->response->generateResponse(500 , false , 'Failed to create task');
       }
 
       $returnData = array();
       $returnData['rows_returned'] = $rowCount;
       $returnData['tasks'] = $data;
-
       $this->response->generateResponse(201 , true , 'Task created' , true , $returnData);
+
+   }
+
+
+   //metodo utilizado para crear un paginador
+   public function pageTask($page , $limit)
+   {
+      //comprobamos que la pagina no esté vacia o  que no sea un numero
+      if($page === '' || !is_numeric($page))
+      {
+         $this->response->generateResponse(400 , false , 'Page number cannot be blank and must be numeric');
+      }
+
+      if($tasks = $this->modelo->pageTask($page , $limit))
+      {
+         $returnData = array();
+         $returnData['rows_returned'] = count($tasks);
+         $returnData['tasks'] = $tasks;
+         $this->response->generateResponse(200 , true , null , true , $returnData);
+      }
+      else{
+         $this->response->generateResponse(400 , false , 'Task not found');
+      }
+
+   }
+
+
+   /*Obtendremos todas las tareas completadas o incompletadas de acuerdo al valor que nos mande el cliente desde la url*/
+   public function completedTask($completed , $bandera )
+   {
+      if($bandera)
+      {
+         if($completed !== 'Y' && $completed !== 'N')
+         {
+            $this->response->generateResponse(400 , false , 'Completed filter must be Y or N');
+         }
+
+
+         if($data = $this->modelo->completed($completed))
+         {
+            $returnData = array();
+
+            $returnData['rows_returned'] = count($data);
+            $returnData['tasks'] = $data;
+
+            $this->response->generateResponse(200 , true , null , true , $returnData);
+         }
+      }
+      else {
+         $this->response->generateResponse(405 , false , 'REQUEST METHOD NOT ALLOWED' );
+      }
+
+
 
    }
 

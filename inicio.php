@@ -1,6 +1,5 @@
 <?php
 
-
    //Aqui vamos a recibir todas las peticiones
    require_once 'controladores/TaskControlador.php';
 
@@ -36,6 +35,35 @@
          break;
       }
 
+   }
+   else if(array_key_exists('page' , $_GET ))
+   {
+      if($_SERVER['REQUEST_METHOD'] == 'GET')
+      {
+         //limite de resultados
+         $limite = 2;
+
+         //Hacemos paginador
+         $page = ($_GET['page'] - 1) * $limite;
+
+         //ejecutamos el controlador encargado de crear el paginador
+         $controlador->pageTask($page , $limite);
+
+      }
+
+   }
+   elseif(array_key_exists("completed" , $_GET))
+   {
+
+      if($_SERVER['REQUEST_METHOD'] === 'GET')
+      {
+         $completed = $_GET['completed'];
+         $controlador->completedTask($completed , true);
+      }
+      else
+      {
+         $controlador->completedTask(null , false);
+      }
    }
    else
    {
