@@ -92,6 +92,12 @@
                }
 
             break;
+            case 'GET':
+               $controlador->getAllTasks();
+            break;
+            default:
+               $controlador->errorMethod();
+            break;
          }
       }
    }

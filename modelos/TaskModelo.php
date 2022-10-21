@@ -98,7 +98,16 @@ class TaskModelo extends Mysql
       $query = $this->conexion->prepare("SELECT id , title , description, date_format(deadline , '%d/%m/%Y %H:%i') as deadline , completed FROM tbltasks WHERE completed = :completed");
       $query->bindParam(':completed' , $completed , PDO::PARAM_STR);
       $query->execute();
-      
+
+      return $query->fetchAll(PDO::FETCH_ASSOC);
+   }
+
+
+   //metodo utilizado para mostrar todas las tareas almacenadas en la database 
+   public function getAllTasks()
+   {
+      $query = $this->conexion->prepare("SELECT id , title , description, date_format(deadline , '%d/%m/%Y %H:%i') as deadline , completed FROM tbltasks");
+      $query->execute();
       return $query->fetchAll(PDO::FETCH_ASSOC);
    }
 }

@@ -175,9 +175,31 @@ class TaskControlador
       else {
          $this->response->generateResponse(405 , false , 'REQUEST METHOD NOT ALLOWED' );
       }
+   }
 
 
+   public function getAllTasks()
+   {
+      if($data = $this->modelo->getAllTasks())
+      {
+         $returnData = array();
 
+         $returnData['rows_returned'] = count($data);
+         $returnData['tasks'] = $data;
+
+         $this->response->generateResponse(200 , true , null , true , $returnData);
+      }
+      else
+      {
+         $this->response->generateResponse(400 , false , 'Task not found');
+      }
+   }
+
+
+   //utilizaremos este metodo para mostrarle al usuario que hubo un problema con el tipo de verbo
+   public function errorMethod()
+   {
+      $this->response->generateResponse(405 , false , 'REQUEST METHOD NOT ALLOWED' );
    }
 
 }
