@@ -13,3 +13,5 @@ RewriteRule ^tasks/completed$ inicio.php?completed=Y [L]
 RewriteRule ^tasks/incompleted$ inicio.php?completed=N [L]
 
 RewriteRule ^tasks/(.+)$ inicio.php?taskid=$1 [L]
+
+RewriteRule ^users$ users.php [L]
