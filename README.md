@@ -9,4 +9,4 @@ Es una API muy básica, cuenta con tres tablas, una llamada task, otra users, y 
 
 En la tabla task almaceno las tareas que me vayan generando los usuarios
 En la tabla users almaceno la informacion referente a los usuarios que se vayan registrando en la API.
-En la tabla session almaceno la session de los usuarios, para tener un control de las consultas que se generan en la APARTIR
+En la tabla session almaceno la session de los usuarios, para tener un control de las consultas que se generan en la API
