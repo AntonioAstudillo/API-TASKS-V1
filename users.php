@@ -31,12 +31,8 @@ if(!$jsonData = json_decode($rawPostData)) {
 // comprobamos que los valores que nos tienen que enviar esten seteados
 if(!isset($jsonData->fullname) || !isset($jsonData->username) || !isset($jsonData->password))
 {
-
   // add message to message array where necessary
-  $message = (!isset($jsonData->fullname)) ? "Full name not supplied" : false;
-  $message = (!isset($jsonData->username)) ? "Username not supplied" : false;
-  $message = (!isset($jsonData->password)) ? "Password not supplied" : false;
-
+  $message = 'Credentials incompleted';
   $objeto->errorMethod(400 , false , $message);
 
 }
