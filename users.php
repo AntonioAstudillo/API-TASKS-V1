@@ -42,7 +42,7 @@ if(strlen($jsonData->fullname) < 1 || strlen($jsonData->fullname) > 255 || strle
   $objeto->errorMethod(400 , false , 'Credentials are not good');
 }
 
-// trim any leading and trailing blank spaces from full name and username only - password may contain a leading or trailing space
+// limpiamos todos los datos
 $fullname = trim($jsonData->fullname);
 $username = trim($jsonData->username);
 $password = trim($jsonData->password);
@@ -50,7 +50,6 @@ $password = trim($jsonData->password);
 
 if($objeto->thereIsUser($username))
 {
-   // hash the password to store in the DB as plain text password stored in DB is bad practice
    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 }
 

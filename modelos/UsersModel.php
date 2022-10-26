@@ -23,10 +23,13 @@ class UsersModel extends Mysql
 
    public function insertUser($fullname , $username , $hashed_password)
    {
-      $query = $this->conexion->prepare('INSERT into users (fullname, username, password) values (:fullname, :username, :password)');
+      $useractive = 'Y';
+
+      $query = $this->conexion->prepare('INSERT into users (fullname, username, password , useractive) values (:fullname, :username, :password , :useractive)');
       $query->bindParam(':fullname', $fullname, PDO::PARAM_STR);
       $query->bindParam(':username', $username, PDO::PARAM_STR);
       $query->bindParam(':password', $hashed_password, PDO::PARAM_STR);
+      $query->bindParam(':useractive', $useractive , PDO::PARAM_STR);
       $query->execute();
 
       return $query->rowCount();

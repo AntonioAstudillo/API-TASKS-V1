@@ -1,8 +1,12 @@
-php_flag display_errors on
+#Autorización SetEnvIf "(.*)" HTTP_AUTHORIZATION = $1
+#es necesario para poder enviar el access token
+SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0
+
 
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
+
 
 RewriteRule ^tasks$  inicio.php [L]
 
@@ -14,6 +18,11 @@ RewriteRule ^tasks/incompleted$ inicio.php?completed=N [L]
 
 RewriteRule ^tasks/(.+)$ inicio.php?taskid=$1 [L]
 
+#ruta para crear usuarios
 RewriteRule ^users$ users.php [L]
 
+#ruta para crear session
 RewriteRule ^session$ sessions.php [L]
+
+#ruta para eliminar session
+RewriteRule ^session/([0-9]+)$ sessions.php?id=$1 [L]

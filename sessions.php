@@ -5,7 +5,56 @@
 
    $objeto = new SessionControllers();
 
-   if(empty($_GET))
+   if(array_key_exists("id" , $_GET))
+   {
+      $metodo = $_SERVER['REQUEST_METHOD'];
+      $id = $_GET['id'];
+
+      //Antes de ejecutar algunos de los metodos, debemos comprobar que exista un token de session
+      if(!isset($_SERVER['HTTP_AUTHORIZATION']) || strlen($_SERVER['HTTP_AUTHORIZATION']) < 1)
+      {
+        $objeto->errorMethod(401 , false , 'The access token is incorrect');
+      }
+
+      //validamos que el token exista
+      switch ($metodo)
+      {
+         case 'PATCH':
+            if(isset($_SERVER['CONTENT_TYPE']) AND  $_SERVER['CONTENT_TYPE'] !== 'application/json')
+            {
+               $objeto->errorMethod(400 , false , "Content Type header not set to JSON");
+            }
+
+            $rawPostData = file_get_contents('php://input');
+
+            if(!$jsonData = json_decode($rawPostData))
+            {
+               $objeto->errorMethod(400 , false , "Request body is not valid JSON");
+            }
+
+            if(!isset($jsonData->refresh))
+            {
+               $objeto->errorMethod(400 , false , 'Refresh Token not set');
+            }
+
+
+            $objeto->updateToken($jsonData->refresh);
+
+
+            break;
+         case 'DELETE':
+            if($objeto->validarAccessToken($_SERVER['HTTP_AUTHORIZATION']))
+            {
+               $objeto->deleteSession($id);
+            }
+            break;
+         default:
+            $objeto->errorMethod(405 , false , 'Request method not allowed');
+            break;
+      }
+
+   }
+   else if(empty($_GET))
    {
 
       if($_SERVER['REQUEST_METHOD'] !== 'POST')
@@ -51,55 +100,55 @@
        $username = $jsonData->username;
        $password = $jsonData->password;
 
-   //si la logica no me falla, aqui no hago ningun condicional, debido a que el proceso lo realizo desde el controlador
-   //en caso de que no exista informacion, desde el controlador mando directamente un mensaje de error y termino la ejecucion del script
-   $row = $objeto->existsUser($username);
+      //si la logica no me falla, aqui no hago ningun condicional, debido a que el proceso lo realizo desde el controlador
+      //en caso de que no exista informacion, desde el controlador mando directamente un mensaje de error y termino la ejecucion del script
+      $row = $objeto->existsUser($username);
 
 
-    // salvamos las variables
-    $returned_id = $row['id'];
-    $returned_fullname = $row['fullname'];
-    $returned_username = $row['username'];
-    $returned_password = $row['password'];
-    $returned_useractive = $row['useractive'];
-    $returned_loginattempts = $row['loginattempts'];
+       // salvamos las variables
+       $returned_id = $row['id'];
+       $returned_fullname = $row['fullname'];
+       $returned_username = $row['username'];
+       $returned_password = $row['password'];
+       $returned_useractive = $row['useractive'];
+       $returned_loginattempts = $row['loginattempts'];
 
-    // comprobamos que el usuario esté activo
-    if($returned_useractive != 'Y')
-    {
-      $objeto->errorMethod(401 , false , 'User account is not active');
-    }
+       // comprobamos que el usuario esté activo
+       if($returned_useractive != 'Y')
+       {
+         $objeto->errorMethod(401 , false , 'User account is not active');
+       }
 
-    // checamos que la cuenta no este bloqueada
-    if($returned_loginattempts >= 3)
-    {
-      $objeto->errorMethod(401 , false , 'User account is currently locked out');
-    }
+       // checamos que la cuenta no este bloqueada
+       if($returned_loginattempts >= 3)
+       {
+         $objeto->errorMethod(401 , false , 'User account is currently locked out');
+       }
 
-    //si el password ingresado por el usuario, no coincide con la contraseña almacenada, actualizamos el campo de intentos y mandamos mensaje de error
-    if(!password_verify($password, $returned_password))
-    {
-      $objeto->updateAttempts($returned_id);
-      $objeto->errorMethod(401 , false , 'Username or password is incorrect');
-    }
+       //si el password ingresado por el usuario, no coincide con la contraseña almacenada, actualizamos el campo de intentos y mandamos mensaje de error
+       if(!password_verify($password, $returned_password))
+       {
+         $objeto->updateAttempts($returned_id);
+         $objeto->errorMethod(401 , false , 'Username or password is incorrect');
+       }
 
-    /*   ---------------------------------------------------------------------
-         APARTIR DE AQUI, COMENZAMOS CON LA LOGICA DE LA GENERACIÓN DEL TOKEN
-         ---------------------------------------------------------------------
-     */
+       /*   ---------------------------------------------------------------------
+            APARTIR DE AQUI, COMENZAMOS CON LA LOGICA DE LA GENERACIÓN DEL TOKEN
+            ---------------------------------------------------------------------
+        */
 
-    $accesstoken = base64_encode(bin2hex(openssl_random_pseudo_bytes(24)).time());
+       $accesstoken = base64_encode(bin2hex(openssl_random_pseudo_bytes(24)).time());
 
-    $refreshtoken = base64_encode(bin2hex(openssl_random_pseudo_bytes(24)).time());
-    $access_token_expiry_seconds = 1200;
-    $refresh_token_expiry_seconds = 1209600;
+       $refreshtoken = base64_encode(bin2hex(openssl_random_pseudo_bytes(24)).time());
+       $access_token_expiry_seconds = 1200;
+       $refresh_token_expiry_seconds = 1209600;
 
-    $objeto->generarToken($returned_id , $access_token_expiry_seconds , $refresh_token_expiry_seconds , $refreshtoken  , $accesstoken);
+       $objeto->generarToken($returned_id , $access_token_expiry_seconds , $refresh_token_expiry_seconds , $refreshtoken  , $accesstoken);
 
 
 
-}//cierra if
-else
-{
-  $objeto->errorMethod(404 , false , 'Endpoint not found');
-}
+   }//cierra if
+   else
+   {
+     $objeto->errorMethod(404 , false , 'Endpoint not found');
+   }
