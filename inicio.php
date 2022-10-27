@@ -1,9 +1,29 @@
 <?php
 
+
+
    //Aqui vamos a recibir todas las peticiones
    require_once 'controladores/TaskControlador.php';
+   require_once 'controladores/SessionControllers.php';
 
    $controlador = new TaskControlador();
+   $objSession = new SessionControllers();
+
+
+
+
+   //comprobamos que el token de session se haya enviado en el header de la peticion
+   if(!isset($_SERVER['HTTP_AUTHORIZATION']) || strlen($_SERVER['HTTP_AUTHORIZATION']) < 1)
+   {
+     $controlador->errorMethod(401 , false , 'The access token is incorrect');
+
+   }
+
+
+   //ahora comprobamos que el token exista y no esté expirado, no es necesario poner esto dentro de una condicional, ya que el proceso se realiza desde el controlador
+   //En caso de que exista algun error, vamos a romper el script desde dicho controlador, mandando un mensaje de error al usuario
+   $objSession->validarAccessToken($_SERVER['HTTP_AUTHORIZATION']);
+
 
    if(array_key_exists("taskid" , $_GET))
    { //abre if 1.1

@@ -197,11 +197,10 @@ class TaskControlador
 
 
    //utilizaremos este metodo para mostrarle al usuario que hubo un problema con el tipo de verbo
-   public function errorMethod()
+   public function errorMethod($status , $sucess , $message)
    {
-      $this->response->generateResponse(405 , false , 'REQUEST METHOD NOT ALLOWED' );
+      $this->response->generateResponse($status , $sucess , $message);
    }
-
 }
 
 

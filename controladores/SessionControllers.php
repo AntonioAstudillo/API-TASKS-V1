@@ -18,7 +18,7 @@ class SessionControllers
 
    public function errorMethod($status , $sucess , $message)
    {
-      $this->response->generateResponse(405 , false , $message);
+      $this->response->generateResponse($status , $sucess , $message);
    }
 
    public function existsUser($username)
@@ -94,7 +94,7 @@ class SessionControllers
 
    }
 
-   
+
    public function updateToken($tokenRefresh)
    {
       // //antes de actualizar, comprobamos que el token exista
